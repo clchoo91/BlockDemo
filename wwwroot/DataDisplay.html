@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Display Data</title>
+    <link rel="icon" type="image/x-icon" href="">
+    <link rel="stylesheet" href="\Asset\css\all.min.css">
+    <link rel="stylesheet" href="\Asset\css\bootstrap.min.css">
+    <link rel="stylesheet" href="\Asset\css\bootstrap-table.min.css">
+    <link rel="stylesheet" href="\Asset\css\main.css">
+</head>
+<body>
+    <div class="main-wrapper">               
+        <table id="block-result" class="table table-bordered table-hover"></table>  
+    </div>
+    <script src="\Asset\js\jquery-3.3.1.min.js"></script>
+    <script src="\Asset\js\bootstrap.bundle.min.js"></script>
+    <script src="\Asset\js\bootstrap-table.min.js"></script>
+    <script src="\Asset\js\moment.min.js"></script>
+    <script>
+        $(function(){
+            var isLoaded = false;
+            $('#block-result').bootstrapTable({
+                method: 'get',
+                url: '/api/data',
+                sidePagination: 'server',
+                search: true,                
+                showRefresh: true,
+                queryParams: function(p){                    
+                    if(!p.search){
+                        this.url = '/api/data'
+                    }
+                    else{
+                        this.url = '/api/data/' + p.search;
+                    }
+                    p = {};
+                },
+                columns: [
+                    {
+                        field: 'txHash',
+                        title: 'TxHash',
+                        sortable: false,                        
+                    },
+                    {
+                        field: 'blockNumber',
+                        title: 'Block',
+                        sortable: true,
+                    },
+                    {
+                        field: 'timestamp',
+                        title: 'Timestamp',
+                        sortable: false,
+                    },
+                    {
+                        field: 'gasPrice',
+                        title: 'Gas Price',
+                        sortable: true,
+                    },
+                    {
+                        field: 'gasUsed',
+                        title: 'Gas Used',
+                        sortable: true,
+                    },
+                ],
+                onPreBody: function(data){
+                    this.sidePagination = "server";
+                    if(!isLoaded){                   
+                        for(var i=0; i<data.length; i++){                       
+                                data[i].timestamp = moment(data[i].timestamp).format('DD/MM/YYYY HH:mm:ss');   
+                        }
+                    }   
+                },
+                onSearch: function(text){
+                    isLoaded = false;
+                },
+                onSort: function(name, order){
+                    this.sidePagination = "client";
+                },
+                onLoadSuccess: function(data){
+                    isLoaded = true;
+                    $('.th-inner.sortable').removeClass('asc desc');
+                },
+                onRefresh: function(param){                    
+                    $('#block-result').bootstrapTable('resetSearch',''); 
+                }
+            });
+        });
+    </script>
+</body>
+</html>
