@@ -5,3 +5,7 @@
 .bootstrap-table .fixed-table-toolbar .columns-right {
     margin-left: 50px;
 }
+
+.bootstrap-table .fixed-table-toolbar .search{
+    width:600px;
+}
